@@ -1,10 +1,19 @@
+import { IEvents } from "../../components/base/events";
+import { Product } from "../models/product";
+
 interface IMainUI {
-    showProducts(): void;
-    showCartIcon(): void;
+    showProducts(products: Product[]): void;
+    showCartIcon(count: number): void;
 }
 
 export class MainUI implements IMainUI {
-    showProducts(): void {}
+    protected container: HTMLElement;
+    protected events: IEvents;
+    protected gallery: HTMLElement;
+    protected cartButton: HTMLElement;
+    protected cartCounter: HTMLElement;
 
-    showCartIcon(): void {}
+    showProducts(products: Product[]): void {}
+
+    showCartIcon(count: number): void {}
 }

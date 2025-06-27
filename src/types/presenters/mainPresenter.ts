@@ -1,16 +1,27 @@
+import { IEvents } from "../../components/base/events";
+import { Cart } from "../models/cart";
+import { Product } from "../models/product";
+import { MainUI } from "../views/mainUI";
+
 interface IMainPresenter {
-    onProductClicked(): void;
+    onProductClicked(product: Product): void;
     onCartClicked(): void;
-    onAddToCart(): void;
-    onRemoveToCart(): void;
+    onAddToCart(product: Product): void;
+    onRemoveToCart(product: Product): void;
 }
 
 export class MainPresenter implements IMainPresenter {
-    onProductClicked(): void {}
+    protected model: Cart;
+    protected view: MainUI;
+    protected events: IEvents;
+
+    constructor(model: Cart, view: MainUI, events: IEvents) {}
+
+    onProductClicked(product: Product): void {}
 
     onCartClicked(): void {}
 
-    onAddToCart(): void {}
+    onAddToCart(product: Product): void {}
 
-    onRemoveToCart(): void {}
+    onRemoveToCart(product: Product): void {}
 }

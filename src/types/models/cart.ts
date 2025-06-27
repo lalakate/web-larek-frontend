@@ -7,18 +7,22 @@ interface ICart {
     removeItem(product: Product): void;
     getItems(): Product[];
     contains(product: Product): boolean;
+    getTotalCost(): number;
 }
 
 export class Cart implements ICart {
     products: Product[];
 
-    constructor(public totalCost: number) {}
+    constructor(public totalCost: number = 0) {}
 
     addItem(product: Product): void {}
+
     removeItem(product: Product): void {}
+
     getItems(): Product[] {
         return this.products;    
     }
+
     contains(product: Product): boolean {
         if(!this.products)
             throw new Error('Cart is empty');
@@ -28,4 +32,6 @@ export class Cart implements ICart {
 
         return false;
     }
+
+    getTotalCost(): number {}
 }
