@@ -1,19 +1,19 @@
 # Проектная работа "Веб-ларек"
 
-Стек: HTML, SCSS, TS, Webpack
+## Стек технологий
+- **HTML5** - разметка
+- **SCSS** - стилизация с препроцессором
+- **TypeScript** - типизированный JavaScript
+- **Webpack** - сборка проекта
 
-Структура проекта:
-- src/ — исходные файлы проекта
-- src/components/ — папка с JS компонентами
-- src/components/base/ — папка с базовым кодом
+## Архитектура проекта
 
-Важные файлы:
-- src/pages/index.html — HTML-файл главной страницы
-- src/types/index.ts — файл с типами
-- src/index.ts — точка входа приложения
-- src/scss/styles.scss — корневой файл стилей
-- src/utils/constants.ts — файл с константами
-- src/utils/utils.ts — файл с утилитами
+Проект построен по паттерну **MVP (Model-View-Presenter)** с использованием **брокера событий** для слабой связанности компонентов:
+
+- **Model** (Модель) - бизнес-логика и данные (`src/types/models/`)
+- **View** (Представление) - компоненты интерфейса (`src/components/`, `src/types/views/`)
+- **Presenter** (Презентер) - связующий слой (`src/types/presenters/`)
+- **Events** (События) - брокер событий для связи компонентов (`src/components/base/events.ts`)
 
 ## Установка и запуск
 Для установки и запуска проекта необходимо выполнить команды
@@ -42,368 +42,247 @@ yarn build
 ```
 
 ## Базовые компоненты
->>
->**1. Класс `EventEmitter`**
->>
->>Реализует паттерн «Наблюдатель» и позволяет подписываться на события и уведомлять подписчиков о наступлении события.
->>
->>Класс имеет методы `on`, `off`, `emit` — для подписки на событие, отписки от события и уведомления подписчиков о наступлении события соответственно.
->>
->>Дополнительно реализованы методы `onAll` и `offAll` — для подписки на все события и сброса всех подписчиков.
->>
->>Интересным дополнением является метод `trigger`, генерирующий заданное событие с заданными аргументами. Это позволяет передавать его в качестве обработчика события в другие классы. Эти классы будут генерировать события, не будучи при этом напрямую зависимыми от класса `EventEmitter`.
->>
->**2. Класс `Api`**
->>
->>Базовый класс для работы с API. Обеспечивает централизованное управление HTTP-запросами к серверу.
->>
->>**Конструктор:** `constructor(baseUrl: string, options: RequestInit = {})` 
->>- `baseUrl: string` - базовый URL API (например, 'https://api.example.com')
->>- `options: RequestInit` - опции запросов (заголовки, методы и т.д.)
->>
->>**Свойства:**
->>- `readonly baseUrl: string` - базовый URL для всех запросов
->>- `protected options: RequestInit` - общие опции для запросов с заголовками по умолчанию
->>
->>**Методы:**
->>- `protected handleResponse(response: Response): Promise<object>` - обработка ответов от сервера, проверка статуса, возврат JSON или ошибки
->>- `get(uri: string): Promise<object>` - выполнение GET запроса к {baseUrl + uri}
->>- `post(uri: string, data: object, method: ApiPostMethods = 'POST'): Promise<object>` - выполнение POST/PUT/DELETE запросов с JSON телом
->>
->>**Пример использования:**
->>```typescript
->>const api = new Api('https://api.shop.com', {headers: {'Authorization': 'Bearer token'}});
->>const products = await api.get('/products');
->>const order = await api.post('/orders', {items: [1,2,3], total: 1500});
->>```
->>
-## Компоненты модели данных (бизнес-логика)
->>
->**1. Интерфейс `IProduct`**
->>
->>Описывает структуру данных товара в интернет-магазине.
->>
->>**Свойства:**
->>- `id: number` - уникальный идентификатор товара
->>- `name: string` - название товара
->>- `category: string` - категория товара
->>- `cost: number` - стоимость товара
->>- `imageURL: string` - URL изображения товара
->>- `description: string` - описание товара
->>
->**2. Класс `Product`**
->>
->>Реализация модели товара. Содержит данные о товаре и используется для создания объектов товаров.
->>
->>**Конструктор:** `constructor(id: number, name: string, category: string, cost: number, imageURL: string, description: string)`
->>- `id: number` - уникальный идентификатор
->>- `name: string` - название товара
->>- `category: string` - категория
->>- `cost: number` - цена
->>- `imageURL: string` - ссылка на изображение
->>- `description: string` - описание
->>
->>**Свойства:** Все свойства объявлены как публичные в конструкторе и доступны напрямую.
->>
->**3. Интерфейс `ICart`**
->>
->>Описывает функциональность корзины покупок для управления выбранными товарами.
->>
->>**Свойства:**
->>- `totalCost: number` - общая стоимость товаров в корзине
->>
->>**Методы:**
->>- `addItem(product: Product): void` - добавление товара в корзину
->>- `removeItem(product: Product): void` - удаление товара из корзины
->>- `getItems(): Product[]` - получение списка всех товаров в корзине
->>- `contains(product: Product): boolean` - проверка наличия товара в корзине
->>
->**4. Класс `Cart`**
->>
->>Реализация корзины покупок. Управляет списком выбранных товаров, подсчитывает общую стоимость.
->>
->>**Конструктор:** `constructor(totalCost: number = 0)`
->>- `totalCost: number` - начальная общая стоимость корзины (по умолчанию 0)
->>
->>**Свойства:**
->>- `products: Product[]` - массив товаров в корзине
->>- `totalCost: number` - общая стоимость товаров
->>
->>**Методы:**
->>- `addItem(product: Product): void` - добавляет товар в корзину, проверяет на дубликаты, пересчитывает общую стоимость
->>- `removeItem(product: Product): void` - удаляет товар из корзины по ID, пересчитывает общую стоимость
->>- `getItems(): Product[]` - возвращает массив товаров в корзине
->>- `contains(product: Product): boolean` - проверяет наличие товара в корзине по ID, выбрасывает ошибку если корзина пуста
->>- `getTotalCost(): number` - возвращает общую стоимость товаров
->>
->**5. Интерфейс `IOrder`**
->>
->>Описывает структуру данных заказа пользователя.
->>
->>**Свойства:**
->>- `paymentMethod: string` - способ оплаты
->>- `deliveryAddress: string` - адрес доставки
->>- `email: string` - email покупателя
->>- `phoneNumber: string` - номер телефона покупателя
->>
->**6. Класс `Order`**
->>
->>Реализация модели заказа. Содержит информацию о способе оплаты и данных покупателя.
->>
->>**Конструктор:** `constructor(paymentMethod: string, deliveryAddress: string, email: string, phoneNumber: string)`
->>- `paymentMethod: string` - способ оплаты
->>- `deliveryAddress: string` - адрес доставки
->>- `email: string` - email
->>- `phoneNumber: string` - телефон
->>
->>**Свойства:** Все свойства объявлены как публичные в конструкторе и доступны напрямую.
->>
-## Компоненты представления
->>
->Элементы интерфейса построены на основе сетки, модальных окон, в качестве значений которых используются DOM-элементы с соответствующими классами.
->>
->**1. Интерфейс `IMainUI`**
->>
->>Описывает функциональность главного интерфейса приложения.
->>
->>**Методы:**
->>- `showProducts(products: Product[]): void` - отображение списка товаров на главной странице
->>- `showCartIcon(count: number): void` - отображение иконки корзины с количеством товаров
->>
->**2. Класс `MainUI`**
->>
->>Реализует основной интерфейс приложения. Отвечает за отображение товаров и элементов навигации.
->>
->>**Конструктор:** `constructor(container: HTMLElement, events: IEvents)`
->>- `container: HTMLElement` - корневой элемент для размещения интерфейса
->>- `events: IEvents` - экземпляр брокера событий для взаимодействия с другими компонентами
->>
->>**Свойства:**
->>- `protected container: HTMLElement` - контейнер главной страницы
->>- `protected events: IEvents` - брокер событий
->>- `protected gallery: HTMLElement` - контейнер для галереи товаров
->>- `protected cartButton: HTMLElement` - кнопка корзины
->>- `protected cartCounter: HTMLElement` - счетчик товаров в корзине
->>
->>**Методы:**
->>- `showProducts(products: Product[]): void` - отображает сетку товаров, создает карточки для каждого товара
->>- `showCartIcon(count: number): void` - отображает иконку корзины с количеством товаров, обновляет счетчик
->>
->**3. Интерфейс `IProductDetailUI`**
->>
->>Описывает функциональность отображения детальной информации о товаре.
->>
->>**Методы:**
->>- `showProductDetail(product: Product): void` - отображение подробной информации о выбранном товаре
->>
->**4. Класс `ProductDetailUI`**
->>
->>Реализует интерфейс детального просмотра товара. Отображает модальное окно с полной информацией о товаре.
->>
->>**Конструктор:** `constructor(container: HTMLElement, events: IEvents)`
->>- `container: HTMLElement` - контейнер для модального окна товара
->>- `events: IEvents` - брокер событий для обработки действий пользователя
->>
->>**Свойства:**
->>- `protected container: HTMLElement` - контейнер модального окна
->>- `protected events: IEvents` - брокер событий
->>- `protected title: HTMLElement` - элемент заголовка товара
->>- `protected image: HTMLImageElement` - изображение товара
->>- `protected description: HTMLElement` - описание товара
->>- `protected price: HTMLElement` - цена товара
->>- `protected category: HTMLElement` - категория товара
->>- `protected addToCartButton: HTMLButtonElement` - кнопка добавления в корзину
->>
->>**Методы:**
->>- `showProductDetail(product: Product): void` - заполняет модальное окно данными товара, устанавливает обработчики событий
->>
->**5. Интерфейс `ICartUI`**
->>
->>Описывает функциональность отображения корзины покупок.
->>
->>**Методы:**
->>- `showCart(): void` - отображение содержимого корзины
->>
->**6. Класс `CartUI`**
->>
->>Реализует интерфейс корзины покупок. Отображает список выбранных товаров и общую стоимость.
->>
->>**Конструктор:** `constructor(container: HTMLElement, events: IEvents)`
->>- `container: HTMLElement` - контейнер для модального окна корзины
->>- `events: IEvents` - брокер событий для обработки действий в корзине
->>
->>**Свойства:**
->>- `protected container: HTMLElement` - контейнер корзины
->>- `protected events: IEvents` - брокер событий
->>- `protected list: HTMLElement` - список товаров в корзине
->>- `protected total: HTMLElement` - элемент общей стоимости
->>- `protected button: HTMLButtonElement` - кнопка оформления заказа
->>
->>**Методы:**
->>- `showCart(items: Product[], total: number): void` - отображает корзину с товарами, обновляет общую стоимость, устанавливает состояние кнопки заказа
->>
->**7. Интерфейс `IOrderUI`**
->>
->>Описывает функциональность отображения форм оформления заказа.
->>
->>**Методы:**
->>- `showOrderForm(state: States): void` - отображение формы заказа в зависимости от этапа оформления
->>
->**8. Класс `OrderUI`**
->>
->>**Назначение:** Реализует интерфейс оформления заказа. Управляет отображением многоэтапной формы заказа.
->>
->>**Конструктор:** `constructor(container: HTMLElement, events: IEvents)`
->>- `container: HTMLElement` - контейнер для формы заказа
->>- `events: IEvents` - брокер событий для обработки форм
->>
->>**Свойства:**
->>- `protected container: HTMLElement` - контейнер формы
->>- `protected events: IEvents` - брокер событий
->>- `protected paymentButtons: NodeListOf<HTMLButtonElement>` - кнопки выбора способа оплаты
->>- `protected addressInput: HTMLInputElement` - поле ввода адреса
->>- `protected emailInput: HTMLInputElement` - поле ввода email
->>- `protected phoneInput: HTMLInputElement` - поле ввода телефона
->>- `protected nextButton: HTMLButtonElement` - кнопка перехода к следующему шагу
->>- `protected errors: HTMLElement` - контейнер для отображения ошибок
->>
->>**Методы:**
->>- `showOrderForm(state: States): void` - отображает соответствующий шаг формы заказа, настраивает валидацию полей, управляет видимостью элементов
->>
->**9. Перечисление `States`**
->>
->>Определяет возможные состояния процесса оформления заказа.
->>
->>**Значения:**
->>- `first` - первый этап оформления заказа
->>- `second` - второй этап оформления заказа
->>
->**10. Интерфейс `IModal`**
->>
->>Описывает функциональность управления модальными окнами.
->>
->>**Методы:**
->>- `show(modal: HTMLElement): void` - показать модальное окно
->>- `hide(modal: HTMLElement): void` - скрыть модальное окно
->>
->**11. Класс `Modal`**
->>
->>Реализует функциональность модальных окон. Управляет отображением и скрытием всплывающих окон.
->>
->>**Конструктор:** `constructor(container: HTMLElement, events: IEvents)`
->>- `container: HTMLElement` - контейнер для модальных окон
->>- `events: IEvents` - брокер событий для обработки закрытия модальных окон
->>
->>**Свойства:**
->>- `protected container: HTMLElement` - основной контейнер модальных окон
->>- `protected events: IEvents` - брокер событий
->>- `protected closeButton: HTMLButtonElement` - кнопка закрытия модального окна
->>- `protected content: HTMLElement` - контейнер для содержимого модального окна
->>
->>**Методы:**
->>- `show(content: HTMLElement): void` - отображает модальное окно с указанным содержимым, добавляет обработчики закрытия по клику вне окна или на кнопку закрытия
->>- `hide(): void` - скрывает модальное окно, удаляет обработчики событий, очищает содержимое
->>
-## Компоненты презентера
->>
->**1. Интерфейс `IMainPresenter`**
->>
->>Описывает функциональность главного презентера, который координирует взаимодействие пользователя с основными элементами интерфейса.
->>
->>**Методы:**
->>- `onProductClicked(): void` - обработка клика по товару в каталоге
->>- `onCartClicked(): void` - обработка клика по иконке корзины
->>- `onAddToCart(): void` - обработка добавления товара в корзину
->>- `onRemoveToCart(): void` - обработка удаления товара из корзины
->>
->**2. Класс `MainPresenter`**
->>
->>Реализует основную бизнес-логику взаимодействия с главной страницей. Координирует работу между моделями данных и представлениями.
->>
->>**Конструктор:** `constructor(model: Cart, view: MainUI, events: IEvents)`
->>- `model: Cart` - модель корзины для управления товарами
->>- `view: MainUI` - представление главной страницы
->>- `events: IEvents` - брокер событий для координации компонентов
->>
->>**Свойства:**
->>- `protected model: Cart` - модель корзины
->>- `protected view: MainUI` - представление
->>- `protected events: IEvents` - брокер событий
->>
->>**Методы:**
->>- `onProductClicked(product: Product): void` - обрабатывает клик по товару, генерирует событие для открытия детального просмотра
->>- `onCartClicked(): void` - обрабатывает клик по корзине, генерирует событие для открытия модального окна корзины
->>- `onAddToCart(product: Product): void` - добавляет товар в модель корзины, обновляет представление счетчика
->>- `onRemoveToCart(product: Product): void` - удаляет товар из модели корзины, обновляет интерфейс
->>
->**3. Интерфейс `IProductPresenter`**
->>
->>Описывает функциональность презентера для детального просмотра товара.
->>
->>**Методы:**
->>- `onToCartClicked(): void` - обработка клика по кнопке "Добавить в корзину"
->>- `onToCloseClicked(): void` - обработка клика по кнопке закрытия модального окна
->>
->**4. Класс `ProductPresenter`**
->>
->>Реализует бизнес-логику для работы с детальной информацией о товаре. Управляет модальным окном товара.
->>
->>**Конструктор:** `constructor(view: ProductDetailUI, cart: Cart, events: IEvents)`
->>- `view: ProductDetailUI` - представление детального просмотра товара
->>- `cart: Cart` - модель корзины для добавления товаров
->>- `events: IEvents` - брокер событий для взаимодействия с другими компонентами
->>
->>**Свойства:**
->>- `protected view: ProductDetailUI` - представление товара
->>- `protected cart: Cart` - модель корзины
->>- `protected events: IEvents` - брокер событий
->>- `protected currentProduct: Product` - текущий просматриваемый товар
->>
->>**Методы:**
->>- `onToCartClicked(product: Product): void` - обрабатывает добавление товара в корзину, обновляет модель, генерирует событие обновления корзины
->>- `onToCloseClicked(): void` - обрабатывает закрытие модального окна товара, генерирует событие закрытия модального окна
->>
->**5. Интерфейс `IOrderPresenter`**
->>
->>Описывает функциональность презентера для процесса оформления заказа.
->>
->>**Методы:**
->>- `onStep1(): void` - обработка первого этапа оформления заказа (выбор способа оплаты и адреса)
->>- `onStep2(): void` - обработка второго этапа оформления заказа (ввод контактных данных)
->>
->**6. Класс `OrderPresenter`**
->>
->>Реализует бизнес-логику многоэтапного процесса оформления заказа. Управляет переходами между этапами и валидацией данных.
->>
->>**Конструктор:** `constructor(view: OrderUI, model: Order, cart: Cart, events: IEvents)`
->>- `view: OrderUI` - представление формы заказа
->>- `model: Order` - модель заказа для хранения данных
->>- `cart: Cart` - модель корзины с выбранными товарами
->>- `events: IEvents` - брокер событий для координации процесса заказа
->>
->>**Свойства:**
->>- `protected view: OrderUI` - представление заказа
->>- `protected model: Order` - модель заказа
->>- `protected cart: Cart` - корзина товаров
->>- `protected events: IEvents` - брокер событий
->>- `protected formErrors: Record<string, string>` - объект для хранения ошибок валидации
->>
->>**Методы:**
->>- `onStep1(formData: {payment: string, address: string}): void` - обрабатывает первый этап заказа, валидирует данные оплаты и доставки, сохраняет в модель, переходит к следующему шагу
->>- `onStep2(formData: {email: string, phone: string}): void` - обрабатывает второй этап заказа, валидирует контактные данные, завершает заказ, отправляет данные на сервер через API
->>
-## Типы данных API
->>
->**1. Тип `ApiListResponse<Type>`**
->>
->>**Назначение:** Описывает структуру ответа API для списочных данных.
->>
->>**Свойства:**
->>- `total: number` - общее количество элементов
->>- `items: Type[]` - массив элементов указанного типа
->>
->**2. Тип `ApiPostMethods`**
->>
->>**Назначение:** Определяет допустимые HTTP методы для изменения данных.
->>
->>**Значения:** `'POST' | 'PUT' | 'DELETE'` - методы для создания, обновления и удаления данных
+
+### 1. Класс `EventEmitter` 
+
+Реализует паттерн «Наблюдатель» и позволяет организовать слабую связанность между компонентами приложения.
+
+**Интерфейс `IEvents`:**
+```typescript
+interface IEvents {
+    on<T extends object>(event: EventName, callback: (data: T) => void): void;
+    emit<T extends object>(event: string, data?: T): void;
+    trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void;
+}
+```
+
+**Основные методы:**
+- `on(event, callback)` - подписка на событие
+- `emit(event, data)` - генерация события с данными
+- `trigger(event, context)` - создание функции-генератора события
+
+### 2. Класс `Api` 
+
+Базовый класс для работы с REST API. Предоставляет методы для выполнения HTTP-запросов.
+
+**Конструктор:** `constructor(baseUrl: string, options: RequestInit = {})`
+
+**Методы:**
+- `get(uri: string): Promise<object>` - GET запрос
+- `post(uri: string, data: object, method?: ApiPostMethods): Promise<object>` - POST/PUT/DELETE запросы
+- `protected handleResponse(response: Response): Promise<object>` - обработка ответов
+
+### 3. Класс `Component<T>` 
+
+Базовый класс для всех компонентов представления. Предоставляет общие методы для работы с DOM.
+
+**Основные методы:**
+- `render(data?: Partial<T>): HTMLElement` - рендеринг компонента
+- `toggleClass(element: HTMLElement, className: string, force?: boolean)` - управление CSS классами
+- `setText(element: HTMLElement, value: unknown)` - установка текста
+- `setImage(element: HTMLImageElement, src: string, alt?: string)` - установка изображения
+
+### 4. Класс `ShopAPI` 
+
+Специализированный класс для работы с API интернет-магазина. Наследует функциональность базового `Api`.
+
+**Методы:**
+- `getProductList(): Promise<IProduct[]>` - получение списка товаров
+- `getProductItem(id: string): Promise<IProduct>` - получение товара по ID
+- `orderProducts(order: IOrder): Promise<IOrderResult>` - отправка заказа
+## Модели данных (Business Logic Layer)
+
+### 1. Модель товара 
+
+**Интерфейс `IProduct`:**
+```typescript
+interface IProduct {
+    id: string;           
+    name: string;         
+    category: string;     
+    cost: number | null;  
+    imageURL: string;     
+    description: string; 
+} 
+```
+
+**Класс `Product`:**
+Реализация модели товара с маппингом данных из API.
+
+**Конструктор:** `constructor(id: string, title: string, category: string, price: number | null, imageURL: string, description: string)`
+
+### 2. Модель корзины 
+
+**Интерфейс `ICartItem`:**
+```typescript
+interface ICartItem {
+    product: Product;    
+    quantity: number;    
+}
+```
+
+**Интерфейс `ICart`:**
+```typescript
+interface ICart {
+    addItem(product: Product): void;
+    removeItem(product: Product): void;
+    removeItemByIndex(index: number): void;
+    getItems(): ICartItem[];
+    getProductsFlat(): Product[];
+    contains(product: Product): boolean;
+    getTotalCost(): number;
+    getCount(): number;
+    clear(): void;
+}
+```
+
+**Класс `Cart`:**
+Управляет товарами в корзине. Ограничение: только один экземпляр каждого товара.
+
+**Основные методы:**
+- `addItem(product)` - добавляет товар (проверяет дубликаты)
+- `removeItemByIndex(index)` - удаляет товар по индексу
+- `getTotalCost()` - подсчитывает общую стоимость
+- `contains(product)` - проверяет наличие товара
+
+### 3. Модель заказа 
+
+**Интерфейс `IOrderForm`:**
+```typescript
+interface IOrderForm {
+    payment?: string;    
+    address?: string;    
+    email?: string;      
+    phone?: string;      
+}
+```
+
+**Класс `OrderModel`:**
+Управляет данными заказа и их валидацией.
+
+**Методы:**
+- `setOrderField(field, value)` - установка поля заказа
+- `validateOrder()` - валидация данных оплаты и адреса
+- `validateContacts()` - валидация контактных данных
+- `setItems(items)` - установка товаров для заказа
+
+### 4. Модель каталога 
+
+**Класс `ProductModel`:**
+Управляет каталогом товаров и уведомлениями об изменениях.
+
+**Методы:**
+- `set items(items: Product[])` - установка списка товаров
+- `getProduct(id: string): Product` - получение товара по ID
+## Компоненты представления (View Layer)
+
+### 1. Модальные окна 
+
+**Класс `Modal`:**
+Управляет отображением модальных окон.
+
+**Конструктор:** `constructor(container: HTMLElement, events: IEvents)`
+
+**Методы:**
+- `open()` - открытие модального окна
+- `close()` - закрытие с восстановлением состояния
+- `render(data: {content: HTMLElement})` - рендеринг с содержимым
+
+### 2. Корзина товаров 
+
+**Класс `Basket`:**
+Отображает список товаров в корзине с возможностью удаления.
+
+**Класс `BasketItem`:**
+Отдельный элемент корзины с номером и кнопкой удаления.
+
+### 3. Карточка товара 
+
+**Класс `Card`:**
+Компактная карточка товара для каталога.
+
+**Класс `ProductView`:**
+Детальный просмотр товара в модальном окне.
+
+### 4. Форма заказа 
+
+**Класс `Order`:**
+Первый этап оформления заказа (способ оплаты и адрес).
+
+**Класс `Contacts`:**
+Второй этап оформления заказа (контактные данные).
+
+**Класс `Success`:**
+Страница успешного оформления заказа.
+
+### 5. Главный интерфейс 
+
+**Класс `MainUI`:**
+Управляет отображением каталога товаров и навигацией.
+
+## Презентеры (Controller Layer)
+
+### 1. Главный презентер 
+
+**Интерфейс `IMainPresenter`:**
+Определяет контракт для управления главной страницей.
+
+**Реализация через события:**
+- `items:changed` - обновление каталога товаров
+- `card:select` - выбор товара для детального просмотра
+- `basket:open` - открытие корзины
+
+### 2. Презентер товара 
+
+**Интерфейс `IProductPresenter`:**
+Управляет взаимодействием с детальным просмотром товара.
+
+**События:**
+- `product:toggle` - добавление/удаление товара из корзины
+- `modal:close` - закрытие модального окна товара
+
+### 3. Презентер заказа 
+
+**Интерфейс `IOrderPresenter`:**
+Координирует процесс оформления заказа.
+
+**События:**
+- `order:open` - начало оформления заказа
+- `order.payment:change` - изменение способа оплаты
+- `contacts:submit` - отправка заказа
+
+## API Integration
+
+### Endpoints:
+- `GET /api/weblarek/product` - получение списка товаров
+- `GET /api/weblarek/product/{id}` - получение товара по ID
+- `POST /api/weblarek/order` - создание заказа
+
+### Типы данных API:
+
+```typescript
+type ApiListResponse<Type> = {
+    total: number;
+    items: Type[];
+};
+
+type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
+
+interface IProduct {
+    id: string;
+    description: string;
+    image: string;
+    title: string;
+    category: string;
+    price: number | null;
+}
+
+interface IOrder {
+    payment: string;
+    email: string;
+    phone: string;
+    address: string;
+    total: number;
+    items: string[];
+}
+```
