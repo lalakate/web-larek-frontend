@@ -1,27 +1,33 @@
 import { IEvents } from "../../components/base/events";
 import { Cart } from "../models/cart";
-import { Product } from "../models/product";
+import { ProductModel } from "../models/productModel";
 import { MainUI } from "../views/mainUI";
 
-interface IMainPresenter {
-    onProductClicked(product: Product): void;
-    onCartClicked(): void;
-    onAddToCart(product: Product): void;
-    onRemoveToCart(product: Product): void;
-}
+export class MainPresenter {
+    constructor(
+        protected model: ProductModel,
+        protected cartModel: Cart,
+        protected view: MainUI,
+        protected events: IEvents
+    ) {
+        this.init()
+    }
 
-export class MainPresenter implements IMainPresenter {
-    protected model: Cart;
-    protected view: MainUI;
-    protected events: IEvents;
+    protected init() {
+        this.events.on('items:changed', (data: {catalog: any[]}) => {
+            this.view.catalog = data.catalog
+        })
 
-    constructor(model: Cart, view: MainUI, events: IEvents) {}
+        this.events.on('cart:changed', () => {
+            this.view.counter = this.cartModel.getCount()
+        })
 
-    onProductClicked(product: Product): void {}
+        this.events.on('card:select', (data: { card: any }) => {
+            this.model.preview = data.card.id
+        })
 
-    onCartClicked(): void {}
-
-    onAddToCart(product: Product): void {}
-
-    onRemoveToCart(product: Product): void {}
+        this.events.on('basket:open', () => {
+            this.events.emit('modal:open', { content: 'basket' })
+        })
+    }
 }
