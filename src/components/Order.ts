@@ -38,7 +38,7 @@ export class Form<T> extends Component<IFormState> {
     }
 
     set valid(value: boolean) {
-        this._submit.disabled = !value;
+        this.setDisabled(this._submit, !value);
     }
 
     set errors(value: string) {
@@ -65,25 +65,17 @@ export class Order extends Form<{payment: string, address: string}> {
 
         this._card.addEventListener('click', (event) => {
             event.preventDefault();
-            this._card.classList.add('button_alt-active');
-            this._cash.classList.remove('button_alt-active');
+            this.toggleClass(this._card, 'button_alt-active', true);
+            this.toggleClass(this._cash, 'button_alt-active', false);
             this.onInputChange('payment', 'card');
         });
 
         this._cash.addEventListener('click', (event) => {
             event.preventDefault();
-            this._cash.classList.add('button_alt-active');
-            this._card.classList.remove('button_alt-active');
+            this.toggleClass(this._cash, 'button_alt-active', true);
+            this.toggleClass(this._card, 'button_alt-active', false);
             this.onInputChange('payment', 'cash');
         });
-    }
-
-    set phone(value: string) {
-        (this.container.elements.namedItem('phone') as HTMLInputElement).value = value;
-    }
-
-    set email(value: string) {
-        (this.container.elements.namedItem('email') as HTMLInputElement).value = value;
     }
 
     set address(value: string) {

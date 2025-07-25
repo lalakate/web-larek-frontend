@@ -6,40 +6,13 @@
   gap: 4rem;
   margin-bottom: 4rem;
 
-  .modal & {
-    gap: 3rem; 
-    margin-bottom: 2rem;
-    
-    @media (max-width: 768px) {
-      gap: 2rem;
-      margin-bottom: 1.5rem;
-    }
-  }
-
   &__field {
     @include mixins.flex(column);
     gap: 1.5rem;
-
-    .modal & {
-      gap: 1.5rem;
-      
-      @media (max-width: 768px) {
-        gap: 1rem;
-      }
-    }
   }
 
   &__buttons {
     @include mixins.flex(row);
     gap: 1.5rem;
-
-    .modal & {
-      gap: 1.5rem;
-      
-      @media (max-width: 768px) {
-        gap: 1rem;
-        flex-direction: column;
-      }
-    }
   }
 }

@@ -8,29 +8,6 @@
     height: $size;
     font-size: $size;
     padding: 0;
-    
-    font-family: 'Glyphter';
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    
-    &:before {
-        @if $name == 'close' {
-            content: "\0045";
-        } @else if $name == 'trash' {
-            content: "\0049"; 
-        } @else if $name == 'basket' {
-            content: "\0042";
-        } @else if $name == 'back' {
-            content: "\0041";
-        } @else if $name == 'chevron' {
-            content: "\0044";
-        } @else if $name == 'star' {
-            content: "\0048";
-        }
-    }
+    @extend .icon;
+    @extend .icon-#{$name};
 }

@@ -1,26 +1,19 @@
-import { Product } from "../types/models/product";
-import { IEvents } from "./base/events";
-import { Card } from "./Card";
-import { Component } from "./Component";
+import { Component } from "./base/Component";
 
-export class Gallery extends Component<{ items: Product[]}> {
-    protected cardTemplate: HTMLTemplateElement
-
-    constructor(container: HTMLElement, protected events: IEvents) {
+export class Gallery extends Component<{ items: HTMLElement[]}> {
+    constructor(container: HTMLElement) {
         super(container)
-        this.cardTemplate = document.querySelector('#card-catalog') as HTMLTemplateElement
     }
 
-    render(data: { items: Product[] }): HTMLElement {
+    set items(cards: HTMLElement[]) {
         this.container.innerHTML = ''
-
-        data.items.forEach(item => {
-            const cardElement = this.cardTemplate.content.cloneNode(true) as DocumentFragment
-            const cardContainer = cardElement.querySelector('.card') as HTMLElement
-            const card = new Card(cardContainer, this.events)
-            this.container.appendChild(card.render(item))
+        cards.forEach(card => {
+            this.container.appendChild(card)
         })
+    }
 
+    render(data: { items: HTMLElement[] }): HTMLElement {
+        this.items = data.items
         return this.container
     }
 }

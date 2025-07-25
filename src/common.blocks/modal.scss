@@ -3,13 +3,14 @@
 
 .modal {
   @include mixins.sublayer;
-  position: fixed;
+  // height: max-content;
+  position: absolute;
   display: none;
   justify-content: center;
-  align-items: center;
   background-color: $overlayBackground;
   z-index: 100;
-  padding: 1rem;
+  padding-top: 5vh;
+  padding-bottom: 5vh;
   box-sizing: border-box;
 
   &_active {
@@ -19,112 +20,16 @@
   &__container {
     @include mixins.container;
     @include mixins.flex(column);
-    gap: 1rem;
+    gap: $defaultPadding;
     background-color: $background;
-    border-radius: 1.5rem;
+    // min-height: 90vmin;
+    border-radius: 3rem;
     box-sizing: border-box;
     position: relative;
-    max-width: 90vw;
-    max-height: 90vh;
-    width: auto;
-    margin: 0;
-    padding: 1.25rem;
-    min-height: auto;
-    overflow-y: auto;
- 
-    .form & {
-      max-width: 600px;
-      width: 600px;
-      
-      @media (max-width: 768px) {
-        max-width: 95vw;
-        width: 95vw;
-      }
-      
-      @media (max-width: 640px) {
-        max-width: 100vw;
-        width: 100vw;
-        border-radius: 0;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      max-width: 95vw;
-      max-height: 95vh;
-      padding: 0.75rem;
-      gap: 0.75rem;
-      border-radius: 1rem;
-    }
-
-    @media (max-width: 1024px) and (min-width: 769px) {
-      max-width: 85vw;
-      max-height: 85vh;
-      padding: 1rem;
-    }
   }
 
   &__content {
     flex-grow: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    padding-right: 4px;
-    
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(95, 140, 199, 0.4));
-      border-radius: 3px;
-      transition: all 0.3s ease;
-      
-      &:hover {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(95, 140, 199, 0.6));
-        transform: scaleX(1.2);
-        box-shadow: 0 0 10px rgba(95, 140, 199, 0.4);
-      }
-      
-      &:active {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(95, 140, 199, 0.8));
-      }
-    }
-    
-    @media (max-width: 768px) {
-      padding-right: 2px;
-      
-      &::-webkit-scrollbar {
-        width: 4px;
-      }
-    }
-  
-    .card {
-      &_full {
-        flex-direction: column;
-        
-        @media (min-width: 768px) {
-          flex-direction: row;
-        }
-      }
-    }
-    
-    .basket {
-      gap: 1rem;
-      
-      &__item {
-        padding: 1rem 0;
-        
-        @media (max-width: 768px) {
-          padding: 0.75rem 0;
-        }
-      }
-    }
   }
 
   &__title {
@@ -136,30 +41,15 @@
   &__actions {
     @include mixins.flex(row);
     align-items: center;
-    gap: 1rem;
-    margin-top: auto;
-    flex-shrink: 0;
-    
-    @media (max-width: 768px) {
-      gap: 0.75rem;
-      flex-direction: column;
-      align-items: stretch;
-    }
+    gap: 2rem;
   }
 
   &__close {
     position: absolute;
-    top: calc(1.25rem / 2);
-    right: calc(1.25rem / 2);
-    @include mixins.icon(1.75rem, 'close');
+    top: calc(#{$defaultPadding} / 2);
+    right: calc(#{$defaultPadding} / 2);
+    @include mixins.icon(2rem, 'close');
     @include mixins.link(white, $hover);
-    z-index: 1;
-    
-    @media (max-width: 768px) {
-      top: calc(0.75rem / 2);
-      right: calc(0.75rem / 2);
-      @include mixins.icon(1.5rem, 'close');
-    }
   }
 
   &__footer {

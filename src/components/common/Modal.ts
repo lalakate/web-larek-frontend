@@ -44,7 +44,7 @@ export class Modal extends Component<IModalData> {
     open() {
         this._scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
         
-        this.container.classList.add('modal_active');
+        this.toggleClass(this.container, 'modal_active', true);
         
         document.body.style.position = 'fixed';
         document.body.style.top = `-${this._scrollPosition}px`;
@@ -57,7 +57,7 @@ export class Modal extends Component<IModalData> {
     }
 
     close() {
-        this.container.classList.remove('modal_active');
+        this.toggleClass(this.container, 'modal_active', false);
         
         document.removeEventListener('keydown', this.handleEscKey);
         

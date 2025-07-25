@@ -9,9 +9,15 @@ import { API_URL, CDN_URL } from './utils/constants';
 import { MainUI } from './types/views/mainUI';
 import { Modal } from './components/common/Modal';
 import { ProductView } from './components/ProductView';
+import { Card } from './components/Card';
+import { Gallery } from './components/Gallery';
 import { Basket, BasketItem } from './components/Basket';
 import { Order, Contacts, Success } from './components/Order';
 import { cloneTemplate, ensureElement } from './utils/utils';
+
+function createProductFromData(data: {id: string, title: string, category: string, price: number | null, image: string, description: string}): Product {
+    return new Product(data.id, data.title, data.category, data.price, data.image, data.description);
+}
 
 const events = new EventEmitter()
 
@@ -24,13 +30,38 @@ const orderModel = new OrderModel()
 const page = document.body;
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
-const mainUIView = new MainUI(page, events);
+const gallery = new Gallery(ensureElement<HTMLElement>('.gallery'));
+const mainUIView = new MainUI(page, events, gallery);
 const basket = new Basket(cloneTemplate<HTMLElement>('#basket'), events);
 const order = new Order(cloneTemplate<HTMLFormElement>('#order'), events);
 const contacts = new Contacts(cloneTemplate<HTMLFormElement>('#contacts'), events);
 
+function createProductCards(products: Product[]): HTMLElement[] {
+    const cardTemplate = document.querySelector('#card-catalog') as HTMLTemplateElement;
+    
+    return products.map(product => {
+        const cardElement = cardTemplate.content.cloneNode(true) as DocumentFragment;
+        const cardContainer = cardElement.querySelector('.card') as HTMLElement;
+        const card = new Card(cardContainer, events);
+        return card.render(product);
+    });
+}
+
+function createBasketItems(cartItems: { product: Product }[]): HTMLElement[] {
+    return cartItems.map((cartItem, index) => {
+        const basketItem = new BasketItem(cloneTemplate<HTMLElement>('#card-basket'), events);
+        return basketItem.render({
+            id: cartItem.product.id.toString(),
+            title: cartItem.product.name,
+            price: cartItem.product.cost,
+            index: index + 1
+        });
+    });
+}
+
 events.on('items:changed', (data: { catalog: Product[] }) => {
-    mainUIView.catalog = data.catalog;
+    const cards = createProductCards(data.catalog);
+    mainUIView.cards = cards;
 });
 
 events.on('card:select', (data: { card: { id: string } }) => {
@@ -60,15 +91,7 @@ events.on('basket:changed', () => {
 });
 
 events.on('basket:open', () => {
-    const basketItems = cartModel.getItems().map((cartItem, index) => {
-        const basketItem = new BasketItem(cloneTemplate<HTMLElement>('#card-basket'), events);
-        return basketItem.render({
-            id: cartItem.product.id.toString(),
-            title: cartItem.product.name,
-            price: cartItem.product.cost,
-            index: index + 1
-        });
-    });
+    const basketItems = createBasketItems(cartModel.getItems());
 
     basket.items = basketItems;
     basket.selected = cartModel.getItems().map(cartItem => cartItem.product.id.toString());
@@ -164,30 +187,13 @@ events.on(/^contacts\..*:change/, (data: { field: string, value: string }) => {
     }
 });
 
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        modal.close();
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const activeModals = document.querySelectorAll('.modal_active');
-    activeModals.forEach(modal => {
-        modal.classList.remove('modal_active');
-    });
-    
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    document.body.style.overflowY = '';
-});
-
 console.log('Starting to load products from:', API_URL);
 api.getProductList()
-    .then(products => {
-        console.log('Products loaded:', products);
-        productModel.items = products
+    .then(productsData => {
+        console.log('Products loaded:', productsData);
+        const products = productsData.map(createProductFromData);
+        productModel.items = products;
     })
     .catch(err => {
-        console.error('Ошибка загрузки товаров: ', err)
+        console.error('Ошибка загрузки товаров: ', err);
     })

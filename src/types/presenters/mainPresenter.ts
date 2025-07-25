@@ -14,15 +14,11 @@ export class MainPresenter {
     }
 
     protected init() {
-        this.events.on('items:changed', (data: {catalog: any[]}) => {
-            this.view.catalog = data.catalog
-        })
-
         this.events.on('cart:changed', () => {
             this.view.counter = this.cartModel.getCount()
         })
 
-        this.events.on('card:select', (data: { card: any }) => {
+        this.events.on('card:select', (data: { card: { id: string } }) => {
             this.model.preview = data.card.id
         })
 
