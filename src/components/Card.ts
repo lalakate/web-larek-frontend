@@ -8,12 +8,12 @@ export class Card extends CardBase {
         if (this._button) {
             this._button.addEventListener('click', (event) => {
                 event.preventDefault();
-                this.events.emit('card:select', { card: this });
+                this.events.emit('card:select', { card: { id: this.id } });
             });
         }
 
         container.addEventListener('click', () => {
-            this.events.emit('card:select', { card: this });
+            this.events.emit('card:select', { card: { id: this.id } });
         });
     }
 }

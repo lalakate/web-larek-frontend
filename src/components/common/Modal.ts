@@ -9,7 +9,6 @@ interface IModalData {
 export class Modal extends Component<IModalData> {
     protected _closeButton: HTMLButtonElement;
     protected _content: HTMLElement;
-    protected _scrollPosition = 0;
 
     constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
@@ -17,58 +16,35 @@ export class Modal extends Component<IModalData> {
         this._closeButton = ensureElement<HTMLButtonElement>('.modal__close', container);
         this._content = ensureElement<HTMLElement>('.modal__content', container);
 
-        this._closeButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            this.close();
-        });
-        this.container.addEventListener('click', (event) => {
-            if (event.target === this.container) {
-                event.preventDefault();
+        this._closeButton.addEventListener('click', this.close.bind(this));
+        this.container.addEventListener('click', this.close.bind(this));
+        this._content.addEventListener('click', (event) => event.stopPropagation());
+        
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
                 this.close();
             }
         });
-        this._content.addEventListener('click', (event) => event.stopPropagation());
     }
 
-    private handleEscKey = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-            event.preventDefault();
-            this.close();
+    set content(value: HTMLElement | null) {
+        if (value) {
+            this._content.replaceChildren(value);
+        } else {
+            this._content.replaceChildren();
         }
     }
 
-    set content(value: HTMLElement) {
-        this._content.replaceChildren(value);
-    }
-
     open() {
-        this._scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-        
         this.toggleClass(this.container, 'modal_active', true);
-        
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${this._scrollPosition}px`;
-        document.body.style.width = '100%';
-        document.body.style.overflowY = 'hidden';
-        
-        document.addEventListener('keydown', this.handleEscKey);
-        
+        document.body.classList.add('modal-open');
         this.events.emit('modal:open');
     }
 
     close() {
         this.toggleClass(this.container, 'modal_active', false);
-        
-        document.removeEventListener('keydown', this.handleEscKey);
-        
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        document.body.style.overflowY = '';
-        
-        window.scrollTo(0, this._scrollPosition);
-        
-        this.content = document.createElement('div');
+        document.body.classList.remove('modal-open');
+        this.content = null;
         this.events.emit('modal:close');
     }
 
